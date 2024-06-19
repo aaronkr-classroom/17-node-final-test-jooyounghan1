@@ -74,10 +74,10 @@ router.use(passport.session()); // passport가 Express.js 내 세션을 사용�
  * Listing 24.2 (p. 351)
  * main.js에서 passport 직렬화 설정
  */
-const User = require("./models/User"); // User 모델을 요청
-passport.use(User.createStrategy()); // User 모델의 인증 전략을 passport에 전달
-passport.serializeUser(User.serializeUser()); // User 모델의 직렬화 메서드를 passport에 전달
-passport.deserializeUser(User.deserializeUser()); // User 모델의 역직렬화 메서드를 passport에 전달
+const User = require("./models/User");
+passport.use(User.createStrategy());
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 /**
  * Listing 22.2 (p. 327)
@@ -97,20 +97,15 @@ router.use((req, res, next) => {
  * =====================================================================
  */
 
-// 애플리케이션에 Mongoose 설정
-const mongoose = require("mongoose"), // mongoose를 요청
-  dbName = "ut-nodejs";
-
+const mongoose = require("mongoose"); // mongoose를 요청
 // 데이터베이스 연결 설정
-mongoose.connect(`mongodb://127.0.0.1:27017/${dbName}`, {
-  useNewUrlParser: true,
-});
-
-// 연결되면 메시지를 보냄
+mongoose.connect(
+  "mongodb+srv://ut-node:bmwbkrGj7SF6V33c@ut-node.034woqa.mongodb.net/?retryWrites=true&w=majority&appName=ut-node", //Atlas 경로 
+);
 const db = mongoose.connection;
-db.once("open", () => {
-  console.log(`Connected to ${dbName} MongoDB using Mongoose!`);
-});
+db.once("open", ()=> {
+  console.log("Connected to MONGODB!!!")
+})
 
 /**
  * =====================================================================
@@ -205,6 +200,26 @@ router.delete(
 /**
  * Comments
  */
+router.get("/discussions", discussionsController.index, discussionsController.indexView); // index 라우트 생성
+router.get("/discussions/new", discussionsController.new); // 생성 폼을 보기 위한 요청 처리
+router.post(
+  "/discussions/create",
+   // strips . from email
+  discussionsController.create,
+  discussionsController.redirectView
+); // 생성 폼에서 받아온 데이터의 처리와 결과를 사용자 보기 페이지에 보여주기
+router.get("/discussions/:id", discussionsController.show, discussionsController.showView);
+router.get("/discussions/:id/edit", discussionsController.edit); // viewing을 처리하기 위한 라우트 추가
+router.put(
+  "/discussions/:id/update",
+  discussionsController.update,
+  discussionsController.redirectView
+); // 편집 폼에서 받아온 데이터의 처리와 결과를 사용자 보기 페이지에 보여주기
+router.delete(
+  "/discussions/:id/delete",
+  discussionsController.delete,
+  discussionsController.redirectView
+);
 router.post(
   "/comments/create",
   commentsController.create,
